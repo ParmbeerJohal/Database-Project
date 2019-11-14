@@ -97,3 +97,22 @@ CREATE TABLE Returned
 	feedback		TEXT	NOT NULL, -- Link to CDN
 	grade			INTEGER	NOT NULL	CHECK (grade >= 0 and grade <= 100)
 );
+
+CREATE FUNCTION create_user(
+	first_name		VARCHAR(20),
+	last_name		VARCHAR(20),
+	username		VARCHAR(20),
+	password		VARCHAR(72),
+	email			VARCHAR(320),
+	skype_address	VARCHAR(50)
+)
+RETURNS VOID
+LANGUAGE plpgsql
+as $$
+BEGIN
+	INSERT INTO Users (first_name, last_name, username,
+		password, email, skype_address)
+	VALUES (first_name, last_name, username,
+		crypt(password, gen_salt('bf')), email, skype_address);
+END;
+$$;
