@@ -1,3 +1,5 @@
+CREATE EXTENSION pgcrypto;
+
 CREATE TABLE Users
 (
 	user_id 		SERIAL	 		NOT NULL -- Do not specify when inserting
