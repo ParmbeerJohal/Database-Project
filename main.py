@@ -12,21 +12,28 @@ app.secret_key=os.urandom(24)
 
 @app.route('/', methods=['GET'])
 def main():
-    pass # TODO
-    # return render_template('index.html')
+    return render_template('index.html')
 
 
-@app.route('/create', methods=['GET','POST'])
+@app.route('/create', methods=['POST'])
 def create():
-    if request.method == 'GET':
-        return render_template('create.html')
+    # if request.method == 'GET':
+    #     return render_template('create.html')
     if request.method == 'POST':
-        print(request.get_json())
+        data = request.get_json()
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute('SELECT * FROM Users;') # TODO
-            data = cur.fetchall()
+            cur.execute('SELECT EXISTS (SELECT * FROM Users WHERE username=%s);', (data['username'],))
+            d = cur.fetchone()
+            print(d)
+            if d['exists']:
+                return jsonify({'exists':1}) # Username in use
+            cur.execute('SELECT create_user(%s, %s, %s, %s, %s, %s, %s, %s)',
+                    (data['first_name'], data['last_name'], data['username'],
+                        data['password'], data['email'], data['skype'],
+                        data['is_teacher'], data['grade_level']))
+            d = cur.fetchall()
             conn.commit()
-        return jsonify(data) # TODO
+            return jsonify({'exists':0})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

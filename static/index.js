@@ -25,14 +25,20 @@ function create_user() {
 	const password = document.getElementById('password').value;
 	const password_confirm = document.getElementById('confirm').value;
 	const skype = document.getElementById('skype').value;
+	const user_type = document.getElementById('user_type').value;
+	const grade_level = document.getElementById('grade_level').value;
 
-	const params = JSON.stringify({first_name: first_name, last_name: last_name, email: email, username: username, password: password, skype: skype});
+	const params = JSON.stringify({first_name: first_name, last_name: last_name, email: email, username: username, password: password, skype: skype, is_teacher: user_type === 'teacher', grade_level: grade_level});
 	getJSON('/create', params,
 		function(err, data) {
 			if (err !== null) {
 				console.log('Error retrieving data: ' + err);
 			} else {
-				console.log('Success: ' + JSON.stringify(data));
+				if (data['exists']) {
+					alert('Username is already in use.');
+				} else {
+					console.log('User creation success.');
+				}
 				// TODO
 			}
 		});
