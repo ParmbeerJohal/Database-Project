@@ -5,8 +5,9 @@
 - Add role '370admin' to server
 - Add db 'db' to server
 
-# To connect
+# To connect manually
 `su 370admin`
 Enter password
+
 `psql -h localhost -p 5432 -d db`
 Enter password
