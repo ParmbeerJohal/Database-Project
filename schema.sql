@@ -6,26 +6,30 @@ CREATE TABLE Users
 		PRIMARY KEY,
 	first_name		VARCHAR(20),
 	last_name		VARCHAR(20),
-	username		VARCHAR(20)		NOT NULL,
+	username		VARCHAR(20)		UNIQUE NOT NULL,
 	password		VARCHAR(72)		NOT NULL,
 	email			VARCHAR(320)	NOT NULL,
 	skype_address	VARCHAR(50),
 	created			TIMESTAMP		NOT NULL -- Do not specify when inserting
-		DEFAULT NOW()
+		DEFAULT NOW(),
+	UNIQUE(username)
 );
 
-CREATE TABLE Languages
+CREATE TABLE Languages -- Insert manually
 (
 	user_id		INTEGER	NOT NULL	REFERENCES Users (user_id),
 	language	CHAR(3)	NOT NULL -- Three character code according to ISO 631-1
 );
 
-CREATE TABLE GradeLevel
+CREATE TABLE GradeLevel -- Insert manually
 (
 	grade_level_id	SERIAL	NOT NULL -- Do not specify when inserting
 		PRIMARY KEY,
-	name			TEXT	NOT NULL
+	name			TEXT	UNIQUE NOT NULL
 );
+
+INSERT INTO GradeLevel (name) VALUES ('k'), ('1'), ('2'), ('3'), ('4'), ('5'),
+('6'), ('7'), ('8'), ('9'), ('10'), ('11'), ('12'), ('13');
 
 CREATE TABLE Students
 (
@@ -54,7 +58,7 @@ CREATE TABLE TeacherAvailability
 		CHECK (end_time-start_time >= TIME '0:00:00')
 );
 
-CREATE TABLE Category
+CREATE TABLE Category -- Insert manually (maybe?)
 (
 	category_id	SERIAL		NOT NULL -- Do not specify when inserting
 		PRIMARY KEY,
@@ -103,10 +107,12 @@ CREATE TABLE Returned
 CREATE FUNCTION create_user(
 	first_name		VARCHAR(20),
 	last_name		VARCHAR(20),
-	username		VARCHAR(20),
+	_username		VARCHAR(20),
 	password		VARCHAR(72),
 	email			VARCHAR(320),
-	skype_address	VARCHAR(50)
+	skype_address	VARCHAR(50),
+	is_teacher		BOOLEAN,
+	grade_level		TEXT
 )
 RETURNS VOID
 LANGUAGE plpgsql
@@ -114,7 +120,18 @@ as $$
 BEGIN
 	INSERT INTO Users (first_name, last_name, username,
 		password, email, skype_address)
-	VALUES (first_name, last_name, username,
+	VALUES (first_name, last_name, _username,
 		crypt(password, gen_salt('bf')), email, skype_address);
+	IF is_teacher THEN
+		INSERT INTO Teachers (teacher_id)
+		SELECT user_id FROM Users WHERE Users.username=_username;
+	ELSE
+		INSERT INTO Students (student_id, grade_level_id)
+		SELECT * FROM
+			(SELECT user_id FROM Users WHERE Users.username=_username) A
+			NATURAL JOIN
+			(SELECT grade_level_id FROM GradeLevel WHERE
+				GradeLevel.name=grade_level) B;
+	END IF;
 END;
 $$;
