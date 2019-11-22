@@ -1,5 +1,8 @@
-import os
+import datetime
 import json
+import os
+
+import pprint
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -17,32 +20,50 @@ def main():
 
 @app.route('/create_user', methods=['POST'])
 def create_user():
-    if request.method == 'POST':
-        data = request.get_json()
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute('SELECT EXISTS (SELECT * FROM Users WHERE username=%s);', (data['username'],))
-            d = cur.fetchone()
-            print(d)
-            if d['exists']:
-                return jsonify({'exists':1}) # Username in use
-            cur.execute('SELECT create_user(%s, %s, %s, %s, %s, %s, %s, %s)',
-                    (data['first_name'], data['last_name'], data['username'],
-                        data['password'], data['email'], data['skype'],
-                        data['is_teacher'], data['grade_level']))
-            d = cur.fetchall()
-            conn.commit()
-            return jsonify({'exists':0})
+    data = request.get_json()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute('SELECT EXISTS (SELECT * FROM Users WHERE username=%s);', (data['username'],))
+        d = cur.fetchone()
+        print(d)
+        if d['exists']:
+            return jsonify({'exists':1}) # Username in use
+        cur.execute('SELECT create_user(%s, %s, %s, %s, %s, %s, %s, %s)',
+                (data['first_name'], data['last_name'], data['username'],
+                    data['password'], data['email'], data['skype'],
+                    data['is_teacher'], data['grade_level']))
+        conn.commit()
+        return jsonify({'exists':0})
 
 @app.route('/create_worksheet', methods=['POST'])
 def create_worksheet():
-    if request.method == 'POST':
-        data = request.get_json()
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute('SELECT create_worksheet(%s, %s, %s, %s)',
-                    (data['creator_id'], data['grade_level'],
-                        data['category'], data['content']))
-            conn.commit()
-        return ''
+    data = request.get_json()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute('SELECT create_worksheet(%s, %s, %s, %s)',
+                (data['creator_id'], data['grade_level'],
+                    data['category'], data['content']))
+        conn.commit()
+    return ''
+
+@app.route('/data', methods=['GET'])
+def data():
+    queries = [
+        'SELECT * FROM Users;',
+        'SELECT * FROM Users WHERE skype_address is NULL;',
+        'SELECT * FROM Users WHERE skype_address is NULL;',
+        'SELECT COUNT(*) FROM TeacherAvailability WHERE start_time <= TIME \'12:00:00\' AND end_time >= TIME \'3:00:00\';'
+        ] # Put queries here
+    data = []
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        for q in queries:
+            cur.execute(q)
+            d = cur.fetchall()
+            print(d)
+            data.append((q,[json.dumps(i, default=dtconv) for i in d]))
+    return render_template('data.html', data=data)
+
+def dtconv(o):
+    if isinstance(o, datetime.datetime):
+        return o.__str__()
 
 
 if __name__ == '__main__':
