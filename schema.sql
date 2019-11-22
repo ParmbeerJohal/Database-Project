@@ -53,8 +53,8 @@ CREATE TABLE TeacherAvailability
 (
 	teacher_id	INTEGER		NOT NULL	REFERENCES Teachers (teacher_id),
 	dow			INTEGER		NOT NULL	CHECK (dow >=0 and dow <=6), -- Day of week
-	start_time	TIMESTAMP	NOT NULL,
-	end_time	TIMESTAMP	NOT NULL
+	start_time	TIME		NOT NULL,
+	end_time	TIME		NOT NULL
 		CHECK (end_time-start_time >= TIME '0:00:00')
 );
 
