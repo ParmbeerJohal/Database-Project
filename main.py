@@ -49,7 +49,7 @@ def data():
     queries = [
         'SELECT * FROM Users;',
         'SELECT * FROM Users WHERE skype_address is NULL;',
-        'SELECT * FROM Users WHERE skype_address is NULL;',
+        'SELECT username, language FROM Users NATURAL JOIN Languages WHERE language=\'en\';',
         'SELECT COUNT(*) FROM TeacherAvailability WHERE start_time <= TIME \'12:00:00\' AND end_time >= TIME \'3:00:00\';'
         ] # Put queries here
     data = []
