@@ -31,8 +31,32 @@
 			<option value='10'>Tenth Grade</option>
 			<option value='11'>Eleventh Grade</option>
 			<option value='12'>Twelfth Grade</option>
-			<option value='13'>Post-Secondary</option>
+			<option value='u'>Post-Secondary</option>
 		</select>
 		<button type='submit' id='submit'>Create Account</button>
+	</form>
+	<br \>
+	<form role='form' onsubmit='create_worksheet(); return false'>
+		<legend>Create Worksheet</legend>
+		<input type='number' placeholder='User ID (temp)' id='creator_id' />
+		<select id='grade_level'>
+			<option value='k'>Kindergartan</option>
+			<option value='1'>First Grade</option>
+			<option value='2'>Second Grade</option>
+			<option value='3'>Third Grade</option>
+			<option value='4'>Fourth Grade</option>
+			<option value='5'>Fifth Grade</option>
+			<option value='6'>Sixth Grade</option>
+			<option value='7'>Seventh Grade</option>
+			<option value='8'>Eight Grade</option>
+			<option value='9'>Ninth Grade</option>
+			<option value='10'>Tenth Grade</option>
+			<option value='11'>Eleventh Grade</option>
+			<option value='12'>Twelfth Grade</option>
+			<option value='u'>Post-Secondary</option>
+		</select>
+		<input type='text' placeholder='Category' id='category' />
+		<input type='text' placeholder='Content URL' id='content' />
+		<button type='submit' id='submit'>Create Worksheet</button>
 	</form>
 </body>

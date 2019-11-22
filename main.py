@@ -15,10 +15,8 @@ def main():
     return render_template('index.html')
 
 
-@app.route('/create', methods=['POST'])
-def create():
-    # if request.method == 'GET':
-    #     return render_template('create.html')
+@app.route('/create_user', methods=['POST'])
+def create_user():
     if request.method == 'POST':
         data = request.get_json()
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -34,6 +32,18 @@ def create():
             d = cur.fetchall()
             conn.commit()
             return jsonify({'exists':0})
+
+@app.route('/create_worksheet', methods=['POST'])
+def create_worksheet():
+    if request.method == 'POST':
+        data = request.get_json()
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute('SELECT create_worksheet(%s, %s, %s, %s)',
+                    (data['creator_id'], data['grade_level'],
+                        data['category'], data['content']))
+            conn.commit()
+        return ''
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
