@@ -18,7 +18,7 @@ CREATE TABLE Users
 CREATE TABLE Languages -- Insert manually
 (
 	user_id		INTEGER	NOT NULL	REFERENCES Users (user_id),
-	language	CHAR(3)	NOT NULL -- Three character code according to ISO 631-1
+	language	CHAR(3)	UNIQUE NOT NULL -- Three character code according to ISO 631-1
 );
 
 CREATE TABLE GradeLevel -- Insert manually
@@ -29,7 +29,7 @@ CREATE TABLE GradeLevel -- Insert manually
 );
 
 INSERT INTO GradeLevel (name) VALUES ('k'), ('1'), ('2'), ('3'), ('4'), ('5'),
-('6'), ('7'), ('8'), ('9'), ('10'), ('11'), ('12'), ('13');
+('6'), ('7'), ('8'), ('9'), ('10'), ('11'), ('12'), ('u');
 
 CREATE TABLE Students
 (
@@ -62,10 +62,12 @@ CREATE TABLE Category -- Insert manually (maybe?)
 (
 	category_id	SERIAL		NOT NULL -- Do not specify when inserting
 		PRIMARY KEY,
-	name		TEXT		NOT NULL,
+	name		TEXT		UNIQUE NOT NULL,
 	created		TIMESTAMP	NOT NULL -- Do not specify when inserting
 		DEFAULT NOW()
 );
+
+INSERT INTO Category (name) VALUES ('math'), ('computer science');
 
 CREATE TABLE Worksheets
 (
@@ -133,5 +135,29 @@ BEGIN
 			(SELECT grade_level_id FROM GradeLevel WHERE
 				GradeLevel.name=grade_level) B;
 	END IF;
+END;
+$$;
+
+SELECT create_user('Nat', 'Dring', 'ndring', '123456', 'nd@uvic.ca', NULL, False, 'u');
+SELECT create_user('Braydon', 'Horcoff', 'bhorcoff', '123456', 'bh@uvic.ca', NULL, False, 'u');
+SELECT create_user('Parm', 'Johal', 'pjohal', '123456', 'pj@uvic.ca', NULL, False, 'u');
+SELECT create_user('Paige', 'Loffler', 'ploffler', '123456', 'pl@uvic.ca', NULL, False, 'u');
+SELECT create_user('Oliver', 'Tonnesen', 'otonnesen', '123456', 'ot@uvic.ca', NULL, False, 'u');
+
+CREATE FUNCTION create_worksheet(
+	creator_id		INTEGER,
+	grade_level		TEXT,
+	_category		TEXT,
+	content			TEXT
+)
+RETURNS VOID
+LANGUAGE plpgsql
+as $$
+BEGIN
+	INSERT INTO Worksheets (creator_id, grade_level_id, category_id, content)
+		SELECT creator_id, grade_level_id, category_id, content FROM
+			GradeLevel JOIN Category ON True WHERE
+				GradeLevel.name=grade_level and Category.name=_category;
+
 END;
 $$;
