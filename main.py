@@ -2,8 +2,6 @@ import datetime
 import json
 import os
 
-import pprint
-
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, jsonify, render_template, request
@@ -24,7 +22,7 @@ def create_user():
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute('SELECT EXISTS (SELECT * FROM Users WHERE username=%s);', (data['username'],))
         d = cur.fetchone()
-        print(d)
+        # print(d)
         if d['exists']:
             return jsonify({'exists':1}) # Username in use
         cur.execute('SELECT create_user(%s, %s, %s, %s, %s, %s, %s, %s)',
@@ -57,7 +55,7 @@ def data():
         for q in queries:
             cur.execute(q)
             d = cur.fetchall()
-            print(d)
+            # print(d)
             data.append((q,[json.dumps(i, default=dtconv) for i in d]))
     return render_template('data.html', data=data)
 
