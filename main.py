@@ -48,7 +48,10 @@ def data():
         'SELECT * FROM Users;',
         'SELECT * FROM Users WHERE skype_address is NULL;',
         'SELECT username, language FROM Users NATURAL JOIN Languages WHERE language=\'en\';',
-        'SELECT COUNT(*) FROM TeacherAvailability WHERE start_time <= TIME \'12:00:00\' AND end_time >= TIME \'3:00:00\';'
+        'SELECT COUNT(*) FROM TeacherAvailability WHERE start_time <= TIME \'12:00:00\' AND end_time >= TIME \'3:00:00\';',
+        'SELECT first_name, last_name FROM Users JOIN Teachers ON user_id = teacher_id JOIN Students ON teacher_id = student_id JOIN GradeLevel ON students.grade_level_id = GradeLevel.grade_level_id WHERE GradeLevel.name = \'9\' OR GradeLevel.name = \'10\' OR GradeLevel.name = \'11\' OR GradeLevel.name = \'12\';',
+        'SELECT first_name, last_name, skype_address FROM Users JOIN Teachers ON user_id = teacher_id WHERE skype_address IS NOT NULL;',
+        'SELECT first_name, last_name FROM Users WHERE user_id = (SELECT student_id FROM Students WHERE student_id = (SELECT DISTINCT student_id FROM Submitted WHERE submission_id = (SELECT submission_id FROM Returned WHERE grade > 89))) ORDER BY last_name;'
         ] # Put queries here
     data = []
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
