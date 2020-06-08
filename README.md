@@ -16,6 +16,6 @@ Enter password
 ## Webpage Setup (command line)
 - Download repository above
 - Switch into directory where 'main.py' is
-- run ''%python main.py' or ''%python3 main.py'
+- run '%python main.py' or '%python3 main.py'
 - go to browser, and type 'localhost:8080' or '0.0.0.0:8080' into the URL
 - type 'localhost:8080/data' to look at stored data
